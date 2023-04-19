@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+      integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <!-- <link rel="stylesheet" href="/WebGazer/www/css/style.css"> -->
+    <script src="https://webgazer.cs.brown.edu/webgazer.js?"></script>
+    <!-- used online webgazer library source-->
+    <!-- <script src="/WebGazer/www/webgazer.js"></script> -->
+    <title>Eye View Tracker For Online Examination</title>
+  </head>
+
+  <body>
+    <div id="count">
+      <div id="alertCount"></div>
+
+      <p>
+        Red Dot Alert Count :
+        <span id="alert-count">0</span>
+      </p>
+      <p class="note">Note: As The Alert Count Of The Red Dot Exceeds 100 Then The Exam will be Closed/Terminated</p>
+    </div>
+    <div class="quiz-container" id="myDiv">
+      <!-- <div class="quiz-header"> -->
+      <h2 id="question">Question is loading...</h2>
+      <ul>
+        <li>
+          <input type="radio" name="answer" id="a" class="answer" />
+          <label for="a" id="a_text">Answer...</label>
+        </li>
+        <li>
+          <input type="radio" name="answer" id="b" class="answer" />
+          <label for="b" id="b_text">Answer...</label>
+        </li>
+        <li>
+          <input type="radio" name="answer" id="c" class="answer" />
+          <label for="c" id="c_text">Answer...</label>
+        </li>
+        <li>
+          <input type="radio" name="answer" id="d" class="answer" />
+          <label for="d" id="d_text">Answer...</label>
+        </li>
+      </ul>
+      <button id="submit">Submit</button>
+      <!-- </div>  -->
+    </div>
+
+    <script>
+      var alertCount = 0
+      var divElement = document.getElementById('myDiv')
+
+      divElement.addEventListener('mouseout', function (event) {
+        // Check if the mouse is outside the div element and not inside any child elements
+        if (!divElement.contains(event.relatedTarget)) {
+          setTimeout(() => {
+            alertCount++
+          }, 10000)
+
+          document.getElementById('alertCount').innerText =
+            'Mouse Out Alert Counts :' + alertCount
+        }
+      })
+
+      // initialize WebGazer
+      webgazer.setRegression('ridge') // set regression type
+      webgazer
+        .setGazeListener(function (data, elapsedTime) {
+          if (!data) return
+
+          var x = data.x
+          var y = data.y
+
+          // Get the position and dimensions of the container div
+          var container = document.getElementById('myDiv')
+          var containerRect = container.getBoundingClientRect()
+
+          // Check if the gaze point is outside of the container
+          if (
+            x < containerRect.left ||
+            x > containerRect.right ||
+            y < containerRect.top ||
+            y > containerRect.bottom
+          ) {
+            // Increment the alert count
+            var alertCount = parseInt(
+              document.getElementById('alert-count').textContent,
+            )
+            document.getElementById('alert-count').textContent = alertCount + 1
+          }
+          //end exam on number of alerts
+          if (alertCount >= 100) {
+            alert('Your exam is ended.')
+            window.close()
+          }
+        })
+        .begin()
+    </script>
+
+    <script src="script.js"></script>
+  </body>
+</html>
